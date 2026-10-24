@@ -122,3 +122,4 @@ pip install -r requirements.txt
 ## 👥 Contributors & Acknowledgements
 - Developed for the **AI Collusion Hackathon**.
 - Inspired by the Colosseum benchmark and research on multi-agent alignment and unintended agent collusion.
+

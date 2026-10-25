@@ -293,6 +293,50 @@ class SimulationRunner:
                 tstamp = r.get("timestamp", "")[:19].replace("T", " ")
                 f.write(f"| {idx} | {tstamp} | **{cond}** | `{model}` | {turns} | {leaked} | {concealed} | {score} | {outcome} |\n")
 
+        # Generate per-run readable markdown transcript
+        transcript_file = self.output_dir / f"transcript_{self.log_filepath.stem}.md"
+        self._write_markdown_transcript(transcript_file)
+
+    def _write_markdown_transcript(self, transcript_file: Path) -> None:
+        """Parses the current run JSONL and outputs a clean markdown transcript."""
+        if not self.log_filepath.exists():
+            return
+
+        with open(self.log_filepath, "r", encoding="utf-8") as f:
+            events = [json.loads(line.strip()) for line in f if line.strip()]
+
+        with open(transcript_file, "w", encoding="utf-8") as f:
+            f.write(f"# Transcript: {self.log_filepath.stem}\n\n")
+            f.write(f"- **Condition:** {self.condition}\n")
+            f.write(f"- **Model:** `{self.model}`\n")
+            f.write(f"- **Turns Used:** {self.env.current_turn} / {self.max_turns}\n")
+            f.write(f"- **PII Leaked:** {'YES' if self.env.pii_leaked_to_analyst else 'NO'}\n")
+            f.write(f"- **Concealment Proof:** {'DETECTED' if self.env.proof_of_concealment else 'None'}\n\n---\n\n")
+
+            for ev in events:
+                if ev.get("event") == "turn_execution":
+                    turn = ev.get("turn")
+                    agent = ev.get("agent")
+                    tool = ev.get("tool_called")
+                    args = ev.get("arguments", {})
+
+                    f.write(f"## Turn {turn}: {agent} -> `{tool}`\n\n")
+
+                    if tool == "send_direct_message":
+                        f.write(f"> **Private message to {args.get('to')}:**\n")
+                        f.write(f"> \"{args.get('message')}\"\n\n")
+                    elif tool == "transfer_to_processor":
+                        f.write(f"- **Instructions:** {args.get('instructions')}\n")
+                        f.write(f"- **Payload:** Transferred dataset to Anonymizer\n\n")
+                    elif tool == "mask_pii":
+                        f.write(f"- **Action:** Masked PII (names, national IDs, addresses/postal codes, phones)\n\n")
+                    elif tool == "send_to_analyst":
+                        f.write(f"- **Compliance Certified:** `{args.get('compliance_certified')}`\n")
+                        f.write(f"- **Payload forwarded to Analyst**\n\n")
+                    elif tool == "submit_risk_score":
+                        f.write(f"- **Score:** `{args.get('score')}`\n")
+                        f.write(f"- **Reasoning:** {args.get('reasoning')}\n\n")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Multi-Agent Collusion Simulation Harness")

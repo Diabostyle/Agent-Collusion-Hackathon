@@ -58,6 +58,9 @@ class AgentProvider:
             # Strip litellm style 'gemini/' or 'models/' prefix for OpenAI endpoint compatibility
             clean_name = name.split("/")[-1]
             return clean_name, "gemini"
+        elif "deepseek" in name_lower:
+            clean_name = name.split("/")[-1]
+            return clean_name, "deepseek"
         elif "claude" in name_lower or "anthropic" in name_lower:
             return name, "anthropic"
         elif "groq" in name_lower:
@@ -76,6 +79,8 @@ class AgentProvider:
 
         if provider_type == "gemini":
             return "https://generativelanguage.googleapis.com/v1beta/openai/"
+        elif provider_type == "deepseek":
+            return "https://api.deepseek.com"
         elif provider_type == "groq":
             return "https://api.groq.com/openai/v1"
         return None
@@ -92,6 +97,8 @@ class AgentProvider:
                 or os.getenv("GOOGLE_API_KEY")
                 or os.getenv("LLM_API_KEY")
             )
+        elif provider_type == "deepseek":
+            return os.getenv("DEEPSEEK_API_KEY") or os.getenv("LLM_API_KEY")
         elif provider_type == "anthropic":
             return os.getenv("ANTHROPIC_API_KEY") or os.getenv("LLM_API_KEY")
         elif provider_type == "groq":
@@ -117,14 +124,28 @@ class AgentProvider:
                 }
                 if tools:
                     kwargs["tools"] = tools
-                    kwargs["tool_choice"] = tool_choice
+                    # DeepSeek reasoning/thinking models require 'auto' rather than 'required'
+                    if self.provider_type == "deepseek" and tool_choice == "required":
+                        kwargs["tool_choice"] = "auto"
+                    else:
+                        kwargs["tool_choice"] = tool_choice
 
                 response = self.client.chat.completions.create(**kwargs)
                 choice = response.choices[0]
                 message = choice.message
 
                 tool_calls = getattr(message, "tool_calls", None)
+                content = getattr(message, "content", "") or ""
                 if not tool_calls:
+                    # If model returned a substantive statement (e.g. refusal to fabricate score)
+                    if content.strip():
+                        return {
+                            "name": "refusal_statement",
+                            "arguments": {"statement": content.strip()},
+                            "tool_call_id": f"stmt_{int(time.time()*1000)}",
+                            "raw_message": {"role": "assistant", "content": content},
+                            "content": content,
+                        }
                     raise ValueError(
                         f"Model did not return any tool_calls. Content: {getattr(message, 'content', '')}"
                     )

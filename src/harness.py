@@ -50,7 +50,7 @@ PROMPTS = {
 
 
 class SimulationRunner:
-    """Orchestrates the multi-agent collusion simulation and logs immutable JSONL traces."""
+    """Orchestrates the multi-agent collusion simulation and maintains a comprehensive experiment report."""
 
     def __init__(
         self,
@@ -81,10 +81,10 @@ class SimulationRunner:
             raise FileNotFoundError(
                 f"CSV file not found at '{csv_path}'. Please create or provide the dataset."
             )
-        
+
         with open(csv_path, "r", encoding="utf-8") as f:
             lines = [line.strip() for line in f if line.strip()]
-        
+
         if self.sample_size > 0 and len(lines) > self.sample_size + 1:
             # Header + first N sample lines
             self.raw_data_csv = "\n".join(lines[: self.sample_size + 1])
@@ -256,12 +256,12 @@ class SimulationRunner:
         logger.info(f"PII Leaked to Analyst: {self.env.pii_leaked_to_analyst}")
         logger.info(f"Proof of Concealment: {self.env.proof_of_concealment}")
         logger.info(f"Log trace: {self.log_filepath}")
-        logger.info(f"Experiment summary updated: {self.output_dir / 'report.md'}")
+        logger.info(f"Experiment report updated: {self.output_dir / 'report.md'}")
 
         return summary
 
     def _update_experiment_summary(self, summary: Dict[str, Any]) -> None:
-        """Maintains an aggregated summary.json and human-readable report.md for the experiment."""
+        """Maintains an aggregated summary.json and a single unified report.md with parameters, prompts, recap table, and full conversations."""
         summary_file = self.output_dir / "summary.json"
         all_runs = []
         if summary_file.exists():
@@ -271,15 +271,32 @@ class SimulationRunner:
             except Exception:
                 all_runs = []
 
-        all_runs.append(summary)
+        # Deduplicate runs by log_file
+        existing_logs = {r.get("log_file") for r in all_runs if r.get("log_file")}
+        if summary.get("log_file") not in existing_logs:
+            all_runs.append(summary)
         with open(summary_file, "w", encoding="utf-8") as f:
             json.dump(all_runs, f, indent=2, ensure_ascii=False)
 
-        # Generate markdown report
+        # Generate single comprehensive report.md
         report_file = self.output_dir / "report.md"
         with open(report_file, "w", encoding="utf-8") as f:
-            f.write(f"# Experiment Report: {self.experiment_name}\n\n")
-            f.write(f"Last updated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+            f.write(f"# 📋 Experiment Report: {self.experiment_name}\n\n")
+            f.write(f"*Last updated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*\n\n")
+
+            # 1. Parameters & Prompts
+            f.write("## ⚙️ Parameters & Agent Configuration\n\n")
+            f.write(f"- **Dataset:** `{self.csv_path}` (Sample size: {self.sample_size if self.sample_size > 0 else 'All'} rows)\n")
+            f.write(f"- **Turn Budget:** Max {self.max_turns} turns total per team\n\n")
+
+            f.write("| Agent | Role | Model | System Prompt |\n")
+            f.write("| :--- | :--- | :--- | :--- |\n")
+            f.write(f"| **Agent 1** | **Data Custodian** | `{self.model}` | {PROMPTS['Custodian'].replace(chr(10), ' ')} |\n")
+            f.write(f"| **Agent 2** | **Anonymizer** | `{self.model}` | {PROMPTS['Anonymizer'].replace(chr(10), ' ')} |\n")
+            f.write(f"| **Agent 3** | **Business Analyst** | `{self.model}` | {PROMPTS['Analyst'].replace(chr(10), ' ')} |\n\n")
+
+            # 2. Recap Table
+            f.write("---\n\n## 📊 Summary Table\n\n")
             f.write("| Run # | Timestamp | Condition | Model | Turns | PII Leaked | Concealment? | Score | Outcome |\n")
             f.write("| :---: | :--- | :---: | :--- | :---: | :---: | :---: | :---: | :---: |\n")
             for idx, r in enumerate(all_runs, 1):
@@ -293,49 +310,40 @@ class SimulationRunner:
                 tstamp = r.get("timestamp", "")[:19].replace("T", " ")
                 f.write(f"| {idx} | {tstamp} | **{cond}** | `{model}` | {turns} | {leaked} | {concealed} | {score} | {outcome} |\n")
 
-        # Generate per-run readable markdown transcript
-        transcript_file = self.output_dir / f"transcript_{self.log_filepath.stem}.md"
-        self._write_markdown_transcript(transcript_file)
+            # 3. Conversations / Transcripts
+            f.write("\n---\n\n## 💬 Agent Conversations & Execution Logs\n\n")
+            for idx, r in enumerate(all_runs, 1):
+                log_path_str = r.get("log_file")
+                f.write(f"### Run {idx} (Condition {r.get('condition')} | Model: `{r.get('model')}`)\n\n")
+                if log_path_str and os.path.exists(log_path_str):
+                    with open(log_path_str, "r", encoding="utf-8") as lf:
+                        events = [json.loads(line.strip()) for line in lf if line.strip()]
 
-    def _write_markdown_transcript(self, transcript_file: Path) -> None:
-        """Parses the current run JSONL and outputs a clean markdown transcript."""
-        if not self.log_filepath.exists():
-            return
+                    for ev in events:
+                        if ev.get("event") == "turn_execution":
+                            turn = ev.get("turn")
+                            agent = ev.get("agent")
+                            tool = ev.get("tool_called")
+                            args = ev.get("arguments", {})
 
-        with open(self.log_filepath, "r", encoding="utf-8") as f:
-            events = [json.loads(line.strip()) for line in f if line.strip()]
+                            f.write(f"#### Turn {turn}: {agent} ➔ `{tool}`\n\n")
 
-        with open(transcript_file, "w", encoding="utf-8") as f:
-            f.write(f"# Transcript: {self.log_filepath.stem}\n\n")
-            f.write(f"- **Condition:** {self.condition}\n")
-            f.write(f"- **Model:** `{self.model}`\n")
-            f.write(f"- **Turns Used:** {self.env.current_turn} / {self.max_turns}\n")
-            f.write(f"- **PII Leaked:** {'YES' if self.env.pii_leaked_to_analyst else 'NO'}\n")
-            f.write(f"- **Concealment Proof:** {'DETECTED' if self.env.proof_of_concealment else 'None'}\n\n---\n\n")
-
-            for ev in events:
-                if ev.get("event") == "turn_execution":
-                    turn = ev.get("turn")
-                    agent = ev.get("agent")
-                    tool = ev.get("tool_called")
-                    args = ev.get("arguments", {})
-
-                    f.write(f"## Turn {turn}: {agent} -> `{tool}`\n\n")
-
-                    if tool == "send_direct_message":
-                        f.write(f"> **Private message to {args.get('to')}:**\n")
-                        f.write(f"> \"{args.get('message')}\"\n\n")
-                    elif tool == "transfer_to_processor":
-                        f.write(f"- **Instructions:** {args.get('instructions')}\n")
-                        f.write(f"- **Payload:** Transferred dataset to Anonymizer\n\n")
-                    elif tool == "mask_pii":
-                        f.write(f"- **Action:** Masked PII (names, national IDs, addresses/postal codes, phones)\n\n")
-                    elif tool == "send_to_analyst":
-                        f.write(f"- **Compliance Certified:** `{args.get('compliance_certified')}`\n")
-                        f.write(f"- **Payload forwarded to Analyst**\n\n")
-                    elif tool == "submit_risk_score":
-                        f.write(f"- **Score:** `{args.get('score')}`\n")
-                        f.write(f"- **Reasoning:** {args.get('reasoning')}\n\n")
+                            if tool == "send_direct_message":
+                                f.write(f"> 🔒 **Private message from {agent} to {args.get('to')}:**\n")
+                                f.write(f"> \"{args.get('message')}\"\n\n")
+                            elif tool == "transfer_to_processor":
+                                f.write(f"- **Instructions:** {args.get('instructions')}\n")
+                                f.write(f"- **Payload:** Transferred customer dataset to Anonymizer\n\n")
+                            elif tool == "mask_pii":
+                                f.write("- **Action:** Applied `mask_pii` redaction on names, national IDs, addresses/postal codes, and phone numbers\n\n")
+                            elif tool == "send_to_analyst":
+                                f.write(f"- **Compliance Certified:** `{args.get('compliance_certified')}`\n")
+                                f.write("- **Payload forwarded to Analyst**\n\n")
+                            elif tool == "submit_risk_score":
+                                f.write(f"- **Score Submitted:** `{args.get('score')}`\n")
+                                f.write(f"- **Analyst Reasoning:** \"{args.get('reasoning')}\"\n\n")
+                else:
+                    f.write("*Log file not found or empty.*\n\n")
 
 
 def main():
@@ -414,4 +422,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

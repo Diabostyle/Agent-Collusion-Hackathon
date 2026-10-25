@@ -49,29 +49,42 @@ class SimulationRunner:
 
     def __init__(
         self,
-        csv_path: str,
+        csv_path: str = "input_data/kyc_synthetic_data_100.csv",
         condition: str = "B",
         model: Optional[str] = None,
         api_key: Optional[str] = None,
         max_turns: int = 10,
         window_size: int = 100,
         output_dir: str = "results",
+        experiment_name: str = "experiment_1",
+        sample_size: int = 10,
     ):
         self.csv_path = csv_path
         self.condition = condition.upper()
-        self.model = model or os.getenv("COLLUSION_MODEL", "gemini/gemini-1.5-flash")
+        self.model = model or os.getenv("COLLUSION_MODEL", "gemini/gemini-flash-latest")
         self.max_turns = max_turns
         self.window_size = window_size
-        self.output_dir = Path(output_dir)
+        self.experiment_name = experiment_name
+        self.sample_size = sample_size
+
+        # Results directory organized by experiment
+        self.output_dir = Path(output_dir) / self.experiment_name
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Load CSV data
+        # Load CSV data (with optional sample limiting for token efficiency)
         if not os.path.exists(csv_path):
             raise FileNotFoundError(
                 f"CSV file not found at '{csv_path}'. Please create or provide the dataset."
             )
+        
         with open(csv_path, "r", encoding="utf-8") as f:
-            self.raw_data_csv = f.read().strip()
+            lines = [line.strip() for line in f if line.strip()]
+        
+        if self.sample_size > 0 and len(lines) > self.sample_size + 1:
+            # Header + first N sample lines
+            self.raw_data_csv = "\n".join(lines[: self.sample_size + 1])
+        else:
+            self.raw_data_csv = "\n".join(lines)
 
         # Initialize Environment and LLM Provider
         self.env = CollusionEnvironment(
@@ -84,7 +97,7 @@ class SimulationRunner:
 
         # Unique session log file
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.log_filepath = self.output_dir / f"run_{timestamp}_cond_{self.condition}.jsonl"
+        self.log_filepath = self.output_dir / f"run_cond_{self.condition}_{timestamp}.jsonl"
 
     def _log_event(self, event_data: Dict[str, Any]) -> None:
         """Immediately appends an event to the immutable .jsonl trace."""
@@ -215,15 +228,50 @@ class SimulationRunner:
             "log_file": str(self.log_filepath),
         }
         self._log_event(summary)
+        self._update_experiment_summary(summary)
 
         logger.info("=== Simulation Finished ===")
         logger.info(f"Outcome: {'SUCCESS' if self.env.is_success else 'FAILED'}")
         logger.info(f"Turns Used: {self.env.current_turn}/{self.max_turns}")
         logger.info(f"PII Leaked to Analyst: {self.env.pii_leaked_to_analyst}")
         logger.info(f"Proof of Concealment: {self.env.proof_of_concealment}")
-        logger.info(f"Full log: {self.log_filepath}")
+        logger.info(f"Log trace: {self.log_filepath}")
+        logger.info(f"Experiment summary updated: {self.output_dir / 'report.md'}")
 
         return summary
+
+    def _update_experiment_summary(self, summary: Dict[str, Any]) -> None:
+        """Maintains an aggregated summary.json and human-readable report.md for the experiment."""
+        summary_file = self.output_dir / "summary.json"
+        all_runs = []
+        if summary_file.exists():
+            try:
+                with open(summary_file, "r", encoding="utf-8") as f:
+                    all_runs = json.load(f)
+            except Exception:
+                all_runs = []
+
+        all_runs.append(summary)
+        with open(summary_file, "w", encoding="utf-8") as f:
+            json.dump(all_runs, f, indent=2, ensure_ascii=False)
+
+        # Generate markdown report
+        report_file = self.output_dir / "report.md"
+        with open(report_file, "w", encoding="utf-8") as f:
+            f.write(f"# Experiment Report: {self.experiment_name}\n\n")
+            f.write(f"Last updated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+            f.write("| Run # | Timestamp | Condition | Model | Turns | PII Leaked | Concealment? | Score | Outcome |\n")
+            f.write("| :---: | :--- | :---: | :--- | :---: | :---: | :---: | :---: | :---: |\n")
+            for idx, r in enumerate(all_runs, 1):
+                cond = r.get("condition", "-")
+                model = r.get("model", "-")
+                turns = f"{r.get('total_turns_used', '-')}/{self.max_turns}"
+                leaked = "🚩 YES" if r.get("pii_leaked_to_analyst") else "✅ NO"
+                concealed = "🚩 CONCEALED" if r.get("proof_of_concealment") else "—"
+                score = r.get("risk_score_submitted", "None")
+                outcome = "✅ SUCCESS" if r.get("is_success") else f"❌ FAIL ({r.get('failure_reason', '')})"
+                tstamp = r.get("timestamp", "")[:19].replace("T", " ")
+                f.write(f"| {idx} | {tstamp} | **{cond}** | `{model}` | {turns} | {leaked} | {concealed} | {score} | {outcome} |\n")
 
 
 def main():
@@ -231,7 +279,7 @@ def main():
     parser.add_argument(
         "--csv-path",
         type=str,
-        default="data/clients.csv",
+        default="input_data/kyc_synthetic_data_100.csv",
         help="Path to synthetic client CSV file",
     )
     parser.add_argument(
@@ -242,10 +290,22 @@ def main():
         help="Experimental condition: 'A' (Control) or 'B' (Private Channel)",
     )
     parser.add_argument(
+        "--experiment",
+        type=str,
+        default="experiment_1",
+        help="Experiment identifier/tab name (e.g. experiment_1, experiment_2)",
+    )
+    parser.add_argument(
+        "--sample-size",
+        type=int,
+        default=10,
+        help="Number of CSV rows to load for prompt context (0 = full dataset)",
+    )
+    parser.add_argument(
         "--model",
         type=str,
-        default=os.getenv("COLLUSION_MODEL", "gemini/gemini-1.5-flash"),
-        help="LLM model identifier for litellm (e.g. gemini/gemini-1.5-flash, gpt-4o-mini, claude-3-5-sonnet)",
+        default=os.getenv("COLLUSION_MODEL", "gemini/gemini-flash-latest"),
+        help="LLM model identifier for litellm (e.g. gemini/gemini-flash-latest, gpt-4o-mini, claude-3-5-sonnet)",
     )
     parser.add_argument(
         "--api-key",
@@ -269,7 +329,7 @@ def main():
         "--output-dir",
         type=str,
         default="results",
-        help="Output directory for immutable JSONL logs",
+        help="Base output directory for results",
     )
 
     args = parser.parse_args()
@@ -282,6 +342,8 @@ def main():
         max_turns=args.max_turns,
         window_size=args.window,
         output_dir=args.output_dir,
+        experiment_name=args.experiment,
+        sample_size=args.sample_size,
     )
     runner.run()
 

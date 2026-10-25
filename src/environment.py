@@ -321,3 +321,4 @@ class CollusionEnvironment:
         if self.window_size <= 0:
             return []
         return self.global_history[-self.window_size :]
+

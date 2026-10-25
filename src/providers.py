@@ -1,11 +1,22 @@
 import json
 import logging
+import os
 import time
 from typing import Any, Dict, List, Optional
 
+from dotenv import load_dotenv
 import litellm
 
-# Reduce verbose litellm logs
+# Automatically load .env if present
+load_dotenv()
+
+# Force local model cost map before litellm import to prevent network requests at startup
+os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = "True"
+
+import litellm
+
+# Optimization and quiet mode for litellm
+litellm.telemetry = False
 litellm.suppress_debug_info = True
 logger = logging.getLogger("AgentProvider")
 
@@ -16,19 +27,69 @@ class LLMToolCallError(RuntimeError):
 
 
 class AgentProvider:
-    """Wrapper around LLM completion API with automatic retries and JSON schema enforcement."""
+    """Wrapper around LLM completion API supporting multi-provider switching (Gemini, OpenAI, Anthropic)."""
 
     def __init__(
         self,
-        model: str = "gpt-4o-mini",
+        model: Optional[str] = None,
+        api_key: Optional[str] = None,
+        api_base: Optional[str] = None,
         temperature: float = 0.2,
         max_retries: int = 3,
         retry_delay_seconds: float = 1.5,
     ):
-        self.model = model
+        raw_model = model or os.getenv("COLLUSION_MODEL", "gemini/gemini-1.5-flash")
+        self.model = self._normalize_model_name(raw_model)
+        self.api_key = self._resolve_api_key(api_key, self.model)
+        self.api_base = api_base or os.getenv("LLM_API_BASE")
         self.temperature = temperature
         self.max_retries = max_retries
         self.retry_delay_seconds = retry_delay_seconds
+
+        logger.info(f"Initialized AgentProvider for model: '{self.model}'")
+
+    @staticmethod
+    def _normalize_model_name(model_name: str) -> str:
+        """Ensures appropriate provider prefixes for litellm (e.g. 'gemini/' prefix)."""
+        model_name = model_name.strip()
+        if "gemini" in model_name.lower() and not model_name.startswith("gemini/"):
+            return f"gemini/{model_name}"
+        return model_name
+
+    @staticmethod
+    def _resolve_api_key(api_key: Optional[str], model: str) -> Optional[str]:
+        """Resolves the appropriate API key from explicit param or provider-specific env vars."""
+        if api_key:
+            return api_key
+
+        model_lower = model.lower()
+
+        # Google Gemini / Vertex
+        if "gemini" in model_lower:
+            return (
+                os.getenv("GEMINI_API_KEY")
+                or os.getenv("GOOGLE_API_KEY")
+                or os.getenv("LLM_API_KEY")
+            )
+
+        # OpenAI
+        if "gpt" in model_lower or "openai" in model_lower:
+            return os.getenv("OPENAI_API_KEY") or os.getenv("LLM_API_KEY")
+
+        # Anthropic Claude
+        if "claude" in model_lower or "anthropic" in model_lower:
+            return os.getenv("ANTHROPIC_API_KEY") or os.getenv("LLM_API_KEY")
+
+        # Groq
+        if "groq" in model_lower:
+            return os.getenv("GROQ_API_KEY") or os.getenv("LLM_API_KEY")
+
+        # Mistral
+        if "mistral" in model_lower:
+            return os.getenv("MISTRAL_API_KEY") or os.getenv("LLM_API_KEY")
+
+        # Generic fallback
+        return os.getenv("LLM_API_KEY")
 
     def generate_action(
         self,
@@ -36,27 +97,25 @@ class AgentProvider:
         tools: List[Dict[str, Any]],
         tool_choice: Any = "required",
     ) -> Dict[str, Any]:
-        """Queries the model and returns a validated tool call.
-
-        Returns:
-            dict containing:
-                - "name": str (name of the tool called)
-                - "arguments": dict (parsed arguments)
-                - "raw_tool_call": dict (original tool call payload)
-                - "raw_message": dict (full message dictionary from LLM)
-                - "content": Optional[str] (agent thoughts / prose, if any)
-        """
+        """Queries the model and returns a validated tool call."""
         last_error = None
 
         for attempt in range(1, self.max_retries + 1):
             try:
-                response = litellm.completion(
-                    model=self.model,
-                    messages=messages,
-                    tools=tools if tools else None,
-                    tool_choice=tool_choice if tools else None,
-                    temperature=self.temperature,
-                )
+                kwargs: Dict[str, Any] = {
+                    "model": self.model,
+                    "messages": messages,
+                    "temperature": self.temperature,
+                }
+                if tools:
+                    kwargs["tools"] = tools
+                    kwargs["tool_choice"] = tool_choice
+                if self.api_key:
+                    kwargs["api_key"] = self.api_key
+                if self.api_base:
+                    kwargs["api_base"] = self.api_base
+
+                response = litellm.completion(**kwargs)
 
                 choice = response.choices[0]
                 message = choice.message

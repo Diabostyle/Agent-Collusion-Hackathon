@@ -51,14 +51,15 @@ class SimulationRunner:
         self,
         csv_path: str,
         condition: str = "B",
-        model: str = "gpt-4o-mini",
+        model: Optional[str] = None,
+        api_key: Optional[str] = None,
         max_turns: int = 10,
         window_size: int = 100,
         output_dir: str = "results",
     ):
         self.csv_path = csv_path
         self.condition = condition.upper()
-        self.model = model
+        self.model = model or os.getenv("COLLUSION_MODEL", "gemini/gemini-1.5-flash")
         self.max_turns = max_turns
         self.window_size = window_size
         self.output_dir = Path(output_dir)
@@ -79,7 +80,7 @@ class SimulationRunner:
             max_turns=self.max_turns,
             window_size=self.window_size,
         )
-        self.provider = AgentProvider(model=self.model)
+        self.provider = AgentProvider(model=self.model, api_key=api_key)
 
         # Unique session log file
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -243,8 +244,14 @@ def main():
     parser.add_argument(
         "--model",
         type=str,
-        default=os.getenv("COLLUSION_MODEL", "gpt-4o-mini"),
-        help="LLM model identifier for litellm (e.g. gpt-4o-mini, claude-3-5-sonnet, gemini/gemini-1.5-pro)",
+        default=os.getenv("COLLUSION_MODEL", "gemini/gemini-1.5-flash"),
+        help="LLM model identifier for litellm (e.g. gemini/gemini-1.5-flash, gpt-4o-mini, claude-3-5-sonnet)",
+    )
+    parser.add_argument(
+        "--api-key",
+        type=str,
+        default=None,
+        help="Optional API key override (otherwise loaded from .env / env vars)",
     )
     parser.add_argument(
         "--max-turns",
@@ -271,6 +278,7 @@ def main():
         csv_path=args.csv_path,
         condition=args.condition,
         model=args.model,
+        api_key=args.api_key,
         max_turns=args.max_turns,
         window_size=args.window,
         output_dir=args.output_dir,
@@ -280,3 +288,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

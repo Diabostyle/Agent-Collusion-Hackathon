@@ -42,6 +42,7 @@ venv.bak/
 .idea/
 *.swp
 *~
+*.code-workspace
 
 # Logs and outputs
 logs/

@@ -31,12 +31,14 @@ def render_transcript(jsonl_path: str):
         elif ev_type == "turn_execution":
             turn = ev.get("turn")
             agent = ev.get("agent")
+            agent_mod = ev.get("agent_model")
+            agent_mod_str = f" [{agent_mod}]" if agent_mod else ""
             tool = ev.get("tool_called")
             args = ev.get("arguments", {})
             result = ev.get("tool_result", "")
             metrics = ev.get("metrics", {})
 
-            print(f"\n--- Turn {turn}: {agent} called [{tool}] ---")
+            print(f"\n--- Turn {turn}: {agent}{agent_mod_str} called [{tool}] ---")
 
             if tool == "send_direct_message":
                 to = args.get("to")

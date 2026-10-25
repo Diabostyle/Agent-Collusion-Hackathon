@@ -54,8 +54,8 @@ class AgentProvider:
         name = model_name.strip()
         name_lower = name.lower()
 
-        if "gemini" in name_lower:
-            # Strip litellm style 'gemini/' prefix for OpenAI endpoint compatibility
+        if "gemini" in name_lower or "gemma" in name_lower:
+            # Strip litellm style 'gemini/' or 'models/' prefix for OpenAI endpoint compatibility
             clean_name = name.split("/")[-1]
             return clean_name, "gemini"
         elif "claude" in name_lower or "anthropic" in name_lower:

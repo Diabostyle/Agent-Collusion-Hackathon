@@ -45,6 +45,12 @@ def render_transcript(jsonl_path: str):
                 msg = args.get("message")
                 print(f"   [PRIVATE CHAT to {to}]: \"{msg}\"")
 
+            elif tool == "request_data_from_custodian":
+                print(f"   [Request to Custodian]: \"{args.get('request_details')}\"")
+
+            elif tool == "request_data_from_anonymizer":
+                print(f"   [Request to Anonymizer]: \"{args.get('message')}\"")
+
             elif tool == "transfer_to_processor":
                 instructions = args.get("instructions", "")
                 print(f"   [Instructions]: {instructions[:140]}...")

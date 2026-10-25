@@ -1,0 +1,101 @@
+customer_id,full_name,national_id,residential_address,phone_number,annual_income,credit_score,loan_amount_requested,transaction_frequency,account_age_months
+CUST-001,Hugo Robert,140125921946,"64 Avenue Victor Hugo, 44000 Nantes",+33 6 28 91 80 30,103067,559,197398,High,181
+CUST-002,Gabriel Durand,299083849428,"52 Avenue Jean Jaures, 59000 Lille",+33 6 53 22 23 85,49165,783,281883,High,229
+CUST-003,Thomas Fournier,259049931790,"55 Rue de la Paix, 33000 Bordeaux",+33 6 73 71 41 41,82612,397,380118,Medium,138
+CUST-004,Emma Roux,146118175236,"62 Chemin des Vignes, 59000 Lille",+33 6 76 82 73 29,90710,414,133993,Medium,197
+CUST-005,Gabriel Petit,151015944824,"144 Avenue Victor Hugo, 34000 Montpellier",+33 6 97 98 79 43,83001,739,105452,Medium,159
+CUST-006,Gabriel Richard,284094073822,"5 Rue des Fleurs, 31000 Toulouse",+33 6 71 66 74 83,117536,670,194350,High,105
+CUST-007,Emma Bernard,240125938046,"148 Avenue Victor Hugo, 06000 Nice",+33 6 50 95 27 91,149787,626,7577,Medium,16
+CUST-008,Arthur Durand,170021464010,"56 Rue de la Paix, 59000 Lille",+33 6 61 21 22 35,33100,792,442652,Medium,216
+CUST-009,Marie Martin,150045238218,"46 Route de Paris, 75001 Paris",+33 6 11 39 17 36,45083,816,195255,Low,180
+CUST-010,Sarah Lefevre,189084687350,"137 Rue des Fleurs, 34000 Montpellier",+33 6 83 10 46 19,97412,787,23192,Medium,72
+CUST-011,Chloe Laurent,175077233437,"148 Impasse des Rossignols, 31000 Toulouse",+33 6 26 44 36 80,52670,491,458818,High,50
+CUST-012,Jean Bernard,149107892341,"53 Place de la Republique, 69001 Lyon",+33 6 66 46 71 60,47668,393,47009,Low,53
+CUST-013,Gabriel Laurent,284053724485,"40 Route de Paris, 67000 Strasbourg",+33 6 94 76 77 23,69459,342,346677,Medium,97
+CUST-014,Marie Lefevre,261098313077,"25 Route de Paris, 67000 Strasbourg",+33 6 28 66 70 10,33054,569,222189,Low,50
+CUST-015,Marie Dubois,173049914766,"44 Avenue Jean Jaures, 59000 Lille",+33 6 95 33 39 68,115727,479,456484,Medium,39
+CUST-016,Jean Martin,140067580371,"9 Rue des Fleurs, 33000 Bordeaux",+33 6 71 37 56 47,52297,666,280135,High,83
+CUST-017,Hugo Michel,188068689079,"144 Rue des Fleurs, 44000 Nantes",+33 6 12 99 63 46,45954,409,140718,Medium,45
+CUST-018,Louis Robert,261067141361,"125 Impasse des Rossignols, 33000 Bordeaux",+33 6 96 51 37 44,56410,779,430049,High,23
+CUST-019,Arthur Dubois,271053237162,"16 Rue des Fleurs, 34000 Montpellier",+33 6 89 86 56 65,88914,542,235987,Low,237
+CUST-020,Jean Lefevre,262036363340,"6 Boulevard Haussmann, 33000 Bordeaux",+33 6 76 70 75 15,145598,675,473962,Medium,68
+CUST-021,Jean Girard,255041576858,"30 Route de Paris, 31000 Toulouse",+33 6 79 22 15 99,89735,403,8610,Low,122
+CUST-022,Louis Fournier,156108663034,"32 Avenue Jean Jaures, 44000 Nantes",+33 6 81 93 76 33,99438,580,444972,High,122
+CUST-023,Marie Bertrand,174126462725,"84 Impasse des Rossignols, 67000 Strasbourg",+33 6 19 98 53 75,116435,721,472178,High,100
+CUST-024,Lucas Richard,161114878179,"92 Boulevard Haussmann, 31000 Toulouse",+33 6 34 63 43 61,81397,320,400100,Medium,113
+CUST-025,Louis Moreau,254071676650,"26 Avenue Jean Jaures, 75001 Paris",+33 6 88 80 28 53,147813,420,366679,Low,75
+CUST-026,Thomas Dubois,251074268077,"68 Route de Paris, 13001 Marseille",+33 6 84 90 70 34,101176,646,399081,Low,175
+CUST-027,Nicolas Bertrand,287069110530,"80 Boulevard Haussmann, 06000 Nice",+33 6 39 17 62 97,69390,336,64016,High,110
+CUST-028,Sophie Bernard,153079419598,"3 Place de la Republique, 67000 Strasbourg",+33 6 95 32 13 60,75232,562,71301,High,168
+CUST-029,Louis Roux,259061113997,"22 Place de la Republique, 31000 Toulouse",+33 6 25 19 74 79,115841,396,132314,Medium,38
+CUST-030,Paul Simon,251022882068,"110 Rue de la Paix, 75001 Paris",+33 6 75 91 70 65,62198,691,227286,Medium,22
+CUST-031,Nicolas Leroy,199045467939,"58 Rue des Fleurs, 59000 Lille",+33 6 62 77 60 32,82088,372,257935,High,64
+CUST-032,Emma Thomas,266108693364,"128 Place de la Republique, 59000 Lille",+33 6 63 60 96 51,103329,636,422959,High,55
+CUST-033,Lucas David,195057325716,"130 Impasse des Rossignols, 44000 Nantes",+33 6 88 52 37 56,60683,517,238650,Medium,175
+CUST-034,Thomas Bertrand,155081840447,"12 Chemin des Vignes, 59000 Lille",+33 6 17 21 42 94,58989,496,229379,Low,2
+CUST-035,Nicolas Simon,250061713193,"47 Boulevard Haussmann, 33000 Bordeaux",+33 6 62 10 23 52,73751,719,24485,High,218
+CUST-036,Louis Girard,245079931196,"28 Impasse des Rossignols, 69001 Lyon",+33 6 85 57 61 33,128149,488,144927,Medium,74
+CUST-037,Arthur David,141075736897,"16 Rue de la Paix, 67000 Strasbourg",+33 6 35 94 44 42,33149,778,191030,Low,98
+CUST-038,Louis Dubois,190066031657,"110 Avenue Jean Jaures, 33000 Bordeaux",+33 6 27 50 72 67,133013,443,28619,High,174
+CUST-039,Arthur Leroy,195116118410,"57 Chemin des Vignes, 59000 Lille",+33 6 50 39 45 17,133274,322,282415,High,13
+CUST-040,Gabriel Dubois,183036534173,"91 Avenue Victor Hugo, 69001 Lyon",+33 6 71 36 87 28,131927,443,16948,High,104
+CUST-041,Sophie Durand,154023634178,"124 Rue de la Paix, 06000 Nice",+33 6 37 21 61 93,91274,496,34388,High,238
+CUST-042,Thomas Simon,257057112620,"32 Rue des Fleurs, 67000 Strasbourg",+33 6 92 35 18 67,36336,800,221512,High,150
+CUST-043,Julie Durand,140062248730,"102 Place de la Republique, 67000 Strasbourg",+33 6 75 90 69 62,55655,467,110876,High,233
+CUST-044,Marie Thomas,193042577619,"18 Route de Paris, 75001 Paris",+33 6 16 84 23 10,90676,318,63541,High,83
+CUST-045,Hugo Robert,284104243447,"149 Place de la Republique, 69001 Lyon",+33 6 66 82 56 26,49476,546,21132,Medium,184
+CUST-046,Emma Leroy,151056841472,"19 Boulevard Haussmann, 67000 Strasbourg",+33 6 89 40 33 33,133819,834,181884,Low,191
+CUST-047,Arthur Bertrand,243027647092,"107 Route de Paris, 06000 Nice",+33 6 50 97 13 60,84042,539,151273,Low,109
+CUST-048,Paul Laurent,273057552795,"8 Avenue Jean Jaures, 59000 Lille",+33 6 53 22 11 21,69300,601,315691,Low,146
+CUST-049,Manon Martin,268079154352,"15 Rue de la Paix, 34000 Montpellier",+33 6 44 15 45 63,62350,419,267957,High,9
+CUST-050,Sarah Bernard,198067172952,"129 Avenue Victor Hugo, 75001 Paris",+33 6 89 70 53 97,129529,724,59605,Medium,57
+CUST-051,Pierre Morel,287029793955,"8 Rue de la Paix, 06000 Nice",+33 6 20 11 65 98,145475,505,411448,Low,176
+CUST-052,Manon Simon,197086635122,"69 Place de la Republique, 69001 Lyon",+33 6 62 27 55 39,149108,629,7439,High,53
+CUST-053,Emma Durand,177017190051,"39 Place de la Republique, 69001 Lyon",+33 6 15 18 94 90,101382,559,405944,Medium,203
+CUST-054,Nicolas David,153101550751,"16 Place de la Republique, 75001 Paris",+33 6 40 86 10 10,123502,766,340675,Low,210
+CUST-055,Paul Simon,173016879893,"150 Impasse des Rossignols, 75001 Paris",+33 6 31 33 32 49,115589,307,345122,Medium,110
+CUST-056,Lucas Simon,248014285518,"58 Impasse des Rossignols, 33000 Bordeaux",+33 6 66 33 21 48,124906,391,181101,Medium,101
+CUST-057,Arthur Girard,169129768872,"35 Rue des Fleurs, 75001 Paris",+33 6 92 55 93 33,42830,680,434239,Medium,223
+CUST-058,Julie Richard,157128481017,"94 Rue des Fleurs, 69001 Lyon",+33 6 36 48 93 95,93361,400,21653,Medium,136
+CUST-059,Thomas Thomas,290126657322,"2 Rue des Fleurs, 33000 Bordeaux",+33 6 79 14 74 81,36227,615,87927,High,49
+CUST-060,Louis Petit,193089510966,"50 Avenue Victor Hugo, 75001 Paris",+33 6 64 92 90 67,36595,682,475681,High,65
+CUST-061,Sarah Bertrand,247127297278,"84 Rue de la Paix, 13001 Marseille",+33 6 31 66 10 43,79720,486,155298,Low,139
+CUST-062,Jean Laurent,285081317553,"12 Place de la Republique, 75001 Paris",+33 6 79 32 39 52,67127,654,160137,Low,158
+CUST-063,Laura Martin,165095142640,"86 Boulevard Haussmann, 75001 Paris",+33 6 43 31 27 94,32252,841,288238,Medium,147
+CUST-064,Emma Girard,180093293955,"41 Avenue Jean Jaures, 33000 Bordeaux",+33 6 68 63 87 37,143942,559,409431,High,192
+CUST-065,Nicolas Morel,277043346916,"90 Chemin des Vignes, 59000 Lille",+33 6 45 20 56 30,62051,807,368200,Low,55
+CUST-066,Chloe Roux,161071621961,"62 Rue de la Paix, 31000 Toulouse",+33 6 43 66 92 43,45546,776,330818,Medium,46
+CUST-067,Laura Dubois,199038827621,"16 Rue de la Paix, 59000 Lille",+33 6 58 45 98 42,104767,480,354095,Medium,161
+CUST-068,Lucas Thomas,176108549038,"76 Place de la Republique, 06000 Nice",+33 6 65 16 92 79,33436,624,457182,Low,123
+CUST-069,Arthur Moreau,163054546165,"110 Avenue Jean Jaures, 33000 Bordeaux",+33 6 87 34 22 75,53688,738,118181,Low,231
+CUST-070,Laura Leroy,194068365227,"112 Rue des Fleurs, 59000 Lille",+33 6 83 92 52 24,99360,642,77614,Medium,2
+CUST-071,Gabriel Moreau,169095362379,"48 Rue de la Gare, 33000 Bordeaux",+33 6 52 62 83 85,33560,380,474596,Medium,184
+CUST-072,Camille Robert,144085822431,"108 Place de la Republique, 06000 Nice",+33 6 51 90 68 68,70352,336,432262,Medium,31
+CUST-073,Emma Martin,254127957857,"143 Boulevard Haussmann, 44000 Nantes",+33 6 12 17 40 36,31571,304,467320,High,71
+CUST-074,Sophie David,271064943686,"100 Rue de la Paix, 34000 Montpellier",+33 6 80 74 78 30,55222,744,488734,High,75
+CUST-075,Marie Fournier,281051343843,"28 Impasse des Rossignols, 44000 Nantes",+33 6 86 63 94 37,117452,740,322879,Medium,39
+CUST-076,Sophie Morel,261024472913,"27 Route de Paris, 31000 Toulouse",+33 6 44 88 63 43,56480,777,412242,Low,99
+CUST-077,Gabriel Petit,296018952987,"22 Avenue Victor Hugo, 59000 Lille",+33 6 60 99 62 85,148406,703,63014,Medium,10
+CUST-078,Hugo Bernard,295039419152,"139 Rue de la Paix, 34000 Montpellier",+33 6 56 27 69 30,63935,501,39952,Medium,32
+CUST-079,Hugo Morel,177049533723,"51 Place de la Republique, 13001 Marseille",+33 6 92 70 98 97,86898,403,285837,High,190
+CUST-080,Paul David,152039897899,"114 Boulevard Haussmann, 33000 Bordeaux",+33 6 28 38 48 65,65618,578,24862,Medium,13
+CUST-081,Gabriel Laurent,179075154213,"95 Rue de la Paix, 59000 Lille",+33 6 27 64 91 72,145198,816,287928,Low,181
+CUST-082,Paul Martin,188013694541,"78 Rue des Fleurs, 34000 Montpellier",+33 6 55 23 47 91,78293,742,57829,Low,98
+CUST-083,Jean Dubois,287106186165,"41 Impasse des Rossignols, 31000 Toulouse",+33 6 34 36 25 65,96194,534,369872,Low,87
+CUST-084,Sarah Simon,192112415222,"91 Rue des Fleurs, 34000 Montpellier",+33 6 14 29 61 47,131524,473,229449,High,184
+CUST-085,Hugo Dubois,273043260660,"36 Avenue Victor Hugo, 69001 Lyon",+33 6 91 54 28 42,55861,373,85888,Low,173
+CUST-086,Lucas Robert,246063027973,"108 Avenue Jean Jaures, 59000 Lille",+33 6 32 64 88 65,125682,338,274742,Low,78
+CUST-087,Sophie Michel,197013448629,"10 Rue des Fleurs, 31000 Toulouse",+33 6 91 50 28 25,44234,768,48243,Low,4
+CUST-088,Gabriel Petit,294036881226,"30 Chemin des Vignes, 75001 Paris",+33 6 37 11 32 74,144604,430,209937,Low,225
+CUST-089,Gabriel Martin,261033745749,"96 Avenue Jean Jaures, 31000 Toulouse",+33 6 60 88 37 65,49320,598,181009,High,88
+CUST-090,Arthur Robert,275044058596,"63 Rue de la Gare, 69001 Lyon",+33 6 36 89 71 75,32346,498,303369,Low,131
+CUST-091,Manon Simon,146123074358,"115 Rue de la Gare, 31000 Toulouse",+33 6 30 17 28 31,65954,525,112543,Medium,99
+CUST-092,Marie Richard,256057919126,"67 Avenue Victor Hugo, 75001 Paris",+33 6 50 98 35 89,32596,524,117715,Medium,176
+CUST-093,Lucas Fournier,250112010727,"119 Avenue Jean Jaures, 59000 Lille",+33 6 62 70 93 43,107428,813,57126,Medium,135
+CUST-094,Hugo Thomas,155039066674,"76 Rue des Fleurs, 33000 Bordeaux",+33 6 72 55 94 24,145534,303,14579,High,33
+CUST-095,Arthur Durand,190077421050,"38 Avenue Jean Jaures, 31000 Toulouse",+33 6 65 25 88 33,26609,548,350101,High,13
+CUST-096,Lea David,266088095096,"14 Boulevard Haussmann, 31000 Toulouse",+33 6 26 97 39 73,78372,519,345964,High,212
+CUST-097,Emma Morel,260084837880,"137 Rue des Fleurs, 44000 Nantes",+33 6 11 53 60 73,27188,643,189749,High,130
+CUST-098,Jean Thomas,169106997564,"6 Place de la Republique, 69001 Lyon",+33 6 30 25 59 87,68742,805,133796,Medium,150
+CUST-099,Hugo Bertrand,281078729371,"75 Boulevard Haussmann, 06000 Nice",+33 6 94 90 29 56,112025,448,73872,Medium,79
+CUST-100,Laura Bernard,152115650542,"2 Avenue Victor Hugo, 44000 Nantes",+33 6 64 37 65 38,113893,386,22767,High,233

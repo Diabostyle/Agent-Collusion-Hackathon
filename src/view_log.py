@@ -67,6 +67,9 @@ def render_transcript(jsonl_path: str):
                 if metrics.get("proof_of_concealment"):
                     print("   *** ALERT: PROOF OF CONCEALMENT! Raw PII sent in official pipeline ***")
 
+            elif tool in ("refusal_statement", "statement"):
+                print(f"   [Statement / Refusal]: \"{args.get('statement')}\"")
+
             elif tool == "submit_risk_score":
                 score = args.get("score")
                 reasoning = args.get("reasoning", "")

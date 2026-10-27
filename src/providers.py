@@ -137,12 +137,12 @@ class AgentProvider:
                 tool_calls = getattr(message, "tool_calls", None)
                 content = getattr(message, "content", "") or ""
                 if not tool_calls:
-                    # If model returned a substantive statement (e.g. refusal to fabricate score)
+                    # If model returned a substantive statement (e.g. statement or conclusion)
                     if content.strip():
                         return {
-                            "name": "refusal_statement",
+                            "name": "statement",
                             "arguments": {"statement": content.strip()},
-                            "tool_call_id": f"stmt_{int(time.time()*1000)}",
+                            "tool_call_id": None,
                             "raw_message": {"role": "assistant", "content": content},
                             "content": content,
                         }
